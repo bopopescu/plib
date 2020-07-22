@@ -90,7 +90,7 @@ class MySQL(object):
 
 		Args:
 			host (str): The name of the connection
-			rel (str): The relationship of the server, master or slave
+			rel (str): The relationship of the server, main or subordinate
 
 		Returns:
 			None
@@ -155,7 +155,7 @@ class MySQL(object):
 
 		Args:
 			host (str): The name of the instance to fetch
-			rel (str): The relationship of the server, master or slave
+			rel (str): The relationship of the server, main or subordinate
 
 		Returns:
 			cursor
@@ -259,7 +259,7 @@ class MySQL(object):
 		cls._dHosts[name]	= details
 
 	@classmethod
-	def escape(cls, host, value, rel='master', errcnt=0):
+	def escape(cls, host, value, rel='main', errcnt=0):
 		"""Escape
 
 		Used to escape string values for the DB
@@ -267,7 +267,7 @@ class MySQL(object):
 		Args:
 			host (str): The name of the instance to escape for
 			value (str): The value to escape
-			rel (str): The relationship of the server, master or slave
+			rel (str): The relationship of the server, main or subordinate
 
 		Returns:
 			str
@@ -327,7 +327,7 @@ class MySQL(object):
 		"""
 
 		# Get the connection
-		oCur		= cls._fetchConnection(host, 'master')
+		oCur		= cls._fetchConnection(host, 'main')
 
 		try:
 
@@ -377,7 +377,7 @@ class MySQL(object):
 			if errcnt < 5:
 
 				# Clear the connection, sleep for a second, and try again
-				cls._clearConnection(host, 'master')
+				cls._clearConnection(host, 'main')
 				time.sleep(1)
 				return cls.execute(host, sql, errcnt=errcnt+1)
 
@@ -441,7 +441,7 @@ class MySQL(object):
 		"""
 
 		# Get the connection
-		oCur	= cls._fetchConnection(host, 'master')
+		oCur	= cls._fetchConnection(host, 'main')
 
 		try:
 
@@ -494,7 +494,7 @@ class MySQL(object):
 			if errcnt < 5:
 
 				# Clear the connection, sleep for a second, and try again
-				cls._clearConnection(host, 'master')
+				cls._clearConnection(host, 'main')
 				time.sleep(1)
 				return cls.insert(host, sql, errcnt=errcnt+1)
 
@@ -519,7 +519,7 @@ class MySQL(object):
 			raise e
 
 	@classmethod
-	def select(cls, host, sql, seltype=ESelect.ALL, field=None, master=False, errcnt=0):
+	def select(cls, host, sql, seltype=ESelect.ALL, field=None, main=False, errcnt=0):
 		"""Select
 
 		Handles SELECT queries and returns the data
@@ -530,8 +530,8 @@ class MySQL(object):
 			seltype (ESelect): The format to return the data in
 			field (str): Only used by HASH_ROWS since MySQLdb has no ordereddict
 				for associative rows
-			master (bool): Set to true to run the select statement off the
-				master and not the slave, necessary for functions that change
+			main (bool): Set to true to run the select statement off the
+				main and not the subordinate, necessary for functions that change
 				data
 
 		Returns:
@@ -542,7 +542,7 @@ class MySQL(object):
 		bDictCursor	= seltype in (ESelect.ALL, ESelect.HASH_ROWS, ESelect.ROW)
 
 		# Get the connection
-		sRel	= (master and 'master' or 'slave')
+		sRel	= (main and 'main' or 'subordinate')
 		oCur	= cls._fetchConnection(host, sRel, dictCursor=bDictCursor)
 
 		try:
